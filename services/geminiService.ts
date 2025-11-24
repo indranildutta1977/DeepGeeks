@@ -1,10 +1,8 @@
 import { GoogleGenAI, type Part } from "@google/genai";
-import { Attachment, Message, ModelType } from "../types.ts";
+import { Attachment, Message, ModelType } from "../types";
 
 // Initialize the client
-// Handle missing API key gracefully for static deployments
-const apiKey = process.env.API_KEY || "";
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateChatResponse = async (
   history: Message[],
@@ -15,10 +13,6 @@ export const generateChatResponse = async (
   useSearch: boolean = false
 ): Promise<{ text: string; groundingMetadata?: any }> => {
   try {
-    if (!apiKey) {
-      throw new Error("API Key is missing. Please check your configuration.");
-    }
-
     const parts: Part[] = [];
 
     // Add attachments

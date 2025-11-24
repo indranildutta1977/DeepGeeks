@@ -4,9 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OmniMind AI</title>
-    <!-- Babel for in-browser compilation of TSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -24,36 +21,22 @@
           },
         },
       }
-      
-      // Polyfill process.env for static deployment
-      window.process = {
-        env: {
-          NODE_ENV: 'development',
-          // Note: On a static host, you cannot securely hide keys. 
-          // Ideally, you should input this in the UI or use a proxy.
-          // For now, this prevents the app from crashing on load.
-          API_KEY: '' 
-        }
-      };
     </script>
-    <script type="importmap">
+  <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "react/": "https://esm.sh/react@18.2.0/",
-    "@google/genai": "https://esm.sh/@google/genai@0.1.1",
-    "lucide-react": "https://esm.sh/lucide-react@0.294.0",
-    "react-markdown": "https://esm.sh/react-markdown@9.0.1",
-    "remark-gfm": "https://esm.sh/remark-gfm@4.0.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.1"
   }
 }
 </script>
-  </head>
+</head>
   <body class="bg-gray-900 text-gray-100 overflow-hidden">
     <div id="root"></div>
-    <!-- Entry Point Script -->
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
   </body>
 </html>

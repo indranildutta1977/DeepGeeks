@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ChatInterface from './components/ChatInterface.tsx';
-import { AppMode } from './types.ts';
+import ChatInterface from './components/ChatInterface';
+import { AppMode } from './types';
 import { Sparkles, Briefcase } from 'lucide-react';
 
 const App: React.FC = () => {

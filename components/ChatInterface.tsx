@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, Brain, Briefcase, FileText, Bot, User, Search, Globe, ChevronDown, ChevronUp } from 'lucide-react';
-import { Message, Attachment, ModelType, AppMode } from '../types.ts';
-import { generateChatResponse, fileToPart } from '../services/geminiService.ts';
-import MarkdownRenderer from './MarkdownRenderer.tsx';
+import { Message, Attachment, ModelType, AppMode } from '../types';
+import { generateChatResponse, fileToPart } from '../services/geminiService';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface ChatInterfaceProps {
   mode: AppMode;
