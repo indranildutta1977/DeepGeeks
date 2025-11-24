@@ -16,7 +16,7 @@ export const generateChatResponse = async (
     const parts: Part[] = [];
 
     // Add attachments
-    if (attachments.length > 0) {
+    if (attachments && attachments.length > 0) {
       for (const att of attachments) {
         parts.push({
           inlineData: {
@@ -28,18 +28,16 @@ export const generateChatResponse = async (
     }
 
     // Add text
-    // Ensure we don't send an empty text part if there are attachments, 
-    // unless the API requires text. Usually mixed content is fine.
-    // If there are no attachments, text is required.
     if (newMessage && newMessage.trim().length > 0) {
       parts.push({ text: newMessage });
-    } else if (parts.length === 0) {
-      // Fallback: No attachments and no text? Should not happen due to UI checks.
-      // But if it does, send a space to avoid empty content error.
+    }
+    
+    // CRITICAL FIX: Ensure parts is never empty. The API requires at least one part.
+    if (parts.length === 0) {
       parts.push({ text: " " });
     }
 
-    // Build chat history
+    // Build chat history with strict validation
     const chatHistory = history.map(msg => {
       const msgParts: Part[] = [];
       
@@ -49,11 +47,12 @@ export const generateChatResponse = async (
         });
       }
       
-      // Add text part if content exists
       if (msg.content && msg.content.trim().length > 0) {
         msgParts.push({ text: msg.content });
-      } else if (msgParts.length === 0) {
-         // Fallback for history items that might be empty
+      }
+
+      // Fallback for history items that might be effectively empty
+      if (msgParts.length === 0) {
          msgParts.push({ text: " " }); 
       }
 
@@ -64,18 +63,20 @@ export const generateChatResponse = async (
     });
 
     // Configure tools
-    const tools = [];
+    const tools: any[] = [];
     if (useSearch || model === ModelType.PRO) { 
        tools.push({ googleSearch: {} });
     }
 
-    const config: any = {
-      systemInstruction,
-      tools: tools.length > 0 ? tools : undefined,
-    };
+    const config: any = {};
+    
+    // Only add systemInstruction if it's a non-empty string
+    if (systemInstruction && systemInstruction.trim().length > 0) {
+      config.systemInstruction = systemInstruction;
+    }
 
-    if (model === ModelType.PRO && (!config.tools || config.tools.length === 0)) {
-        config.tools = [{ googleSearch: {} }];
+    if (tools.length > 0) {
+      config.tools = tools;
     }
 
     const chat = ai.chats.create({
@@ -84,8 +85,8 @@ export const generateChatResponse = async (
       history: chatHistory
     });
 
-    // Correct usage of sendMessage according to @google/genai SDK
-    // Pass 'message' property with the parts array
+    // Pass 'message' property with the parts array.
+    // We strictly use the { message: parts } format to support multi-modal inputs.
     const result = await chat.sendMessage({
       message: parts
     });
@@ -97,7 +98,7 @@ export const generateChatResponse = async (
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    return { text: `Error: ${error.message || "Something went wrong with the AI service."}` };
+    return { text: `Error: ${error.message || "Something went wrong with the AI service. Please try again."}` };
   }
 };
 
