@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ChatInterface from './components/ChatInterface.tsx';
-import { AppMode } from './types.ts';
+import ChatInterface from './components/ChatInterface';
+import { AppMode } from './types';
 import { Sparkles, Briefcase } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -9,7 +9,7 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen w-full bg-black font-sans selection:bg-blue-500/30">
       
-      {/* Sidebar - Desktop */}
+      {/* Sidebar - Simplified for layout */}
       <div className="hidden md:flex flex-col w-[260px] bg-gray-950 border-r border-gray-800 p-4">
         <div className="flex items-center gap-2 mb-8 px-2">
            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -55,26 +55,23 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Top Toggle (Animated Slide Switch) */}
+      {/* Mobile Top Toggle (Slide Switch Style) */}
       <div className="md:hidden absolute top-0 left-0 right-0 z-50 p-2 bg-gray-950/80 backdrop-blur border-b border-gray-800 flex justify-center">
-         <div className="relative flex bg-gray-900 p-1.5 rounded-full border border-gray-800 shadow-inner w-64">
+         <div className="relative flex bg-gray-900 p-1 rounded-full border border-gray-800">
             {/* Animated Slider Background */}
             <div 
-              className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gray-800 rounded-full transition-all duration-300 ease-out shadow-sm border border-gray-700 ${
-                mode === AppMode.GENERAL ? 'translate-x-0' : 'translate-x-full left-[6px]'
-              }`}
-              style={{ left: mode === AppMode.GENERAL ? '6px' : undefined }}
+              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-gray-800 rounded-full transition-all duration-300 shadow-sm border border-gray-700 ${mode === AppMode.GENERAL ? 'left-1' : 'left-[calc(50%+2px)]'}`}
             ></div>
             
             <button 
               onClick={() => setMode(AppMode.GENERAL)}
-              className={`relative z-10 w-1/2 text-center py-1.5 rounded-full text-xs font-bold transition-colors duration-300 ${mode === AppMode.GENERAL ? 'text-white' : 'text-gray-500'}`}
+              className={`relative z-10 px-6 py-1.5 rounded-full text-xs font-medium transition-colors ${mode === AppMode.GENERAL ? 'text-white' : 'text-gray-400'}`}
             >
               General
             </button>
             <button 
               onClick={() => setMode(AppMode.CAREER)}
-              className={`relative z-10 w-1/2 text-center py-1.5 rounded-full text-xs font-bold transition-colors duration-300 ${mode === AppMode.CAREER ? 'text-blue-400' : 'text-gray-500'}`}
+              className={`relative z-10 px-6 py-1.5 rounded-full text-xs font-medium transition-colors ${mode === AppMode.CAREER ? 'text-white' : 'text-gray-400'}`}
             >
               Career
             </button>
@@ -82,7 +79,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col relative h-full md:ml-0 pt-14 md:pt-0">
+      <main className="flex-1 flex flex-col relative h-full md:ml-0 pt-12 md:pt-0">
         <ChatInterface mode={mode} />
       </main>
     </div>

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, Brain, Briefcase, FileText, Bot, User, Search, Globe, ChevronDown, ChevronUp } from 'lucide-react';
-import { Message, Attachment, ModelType, AppMode } from '../types.ts';
-import { generateChatResponse, fileToPart } from '../services/geminiService.ts';
-import MarkdownRenderer from './MarkdownRenderer.tsx';
+import { Message, Attachment, ModelType, AppMode } from '../types';
+import { generateChatResponse, fileToPart } from '../services/geminiService';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface ChatInterfaceProps {
   mode: AppMode;
@@ -96,8 +96,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
     // Prepare context for API
     // If in Career mode and attachments exist but no text, assume resume analysis request
     let promptToSend = userMessage.content;
-    if (mode === AppMode.CAREER && !promptToSend.trim() && userMessage.attachments && userMessage.attachments.length > 0) {
-      promptToSend = "Analyze this resume file. Provide a detailed report on job prospects, eligible roles, available jobs with links, and current market trends.";
+    if (mode === AppMode.CAREER && !promptToSend && userMessage.attachments && userMessage.attachments.length > 0) {
+      promptToSend = "Analyze this resume. Provide a detailed report on job prospects, eligible roles, available jobs with links, and current market trends.";
     }
 
     try {
@@ -154,7 +154,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
           <div>
             <h2 className="font-semibold text-lg">{mode === AppMode.GENERAL ? 'OmniChat' : 'Career Architect'}</h2>
             <p className="text-xs text-gray-400 hidden sm:block">
-              {mode === AppMode.GENERAL ? 'Ask anything, upload any file.' : 'Resume analysis & Job Market Intelligence.'}
+              {mode === AppMode.GENERAL ? 'Ask anything, explore ideas.' : 'Resume analysis & Job Market Intelligence.'}
             </p>
           </div>
         </div>
@@ -203,17 +203,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
           className="w-full flex items-center justify-center py-1 mt-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
         >
           {showPromptEditor ? <ChevronUp className="w-3 h-3 mr-1" /> : <ChevronDown className="w-3 h-3 mr-1" />}
-          {showPromptEditor ? 'Hide Prompt Settings' : 'Custom System Instruction / Context'}
+          {showPromptEditor ? 'Hide Prompt Engineer' : 'Enhance System Prompt'}
         </button>
         
         {showPromptEditor && (
           <div className="mt-2 p-3 bg-gray-800/50 border border-gray-700 rounded-lg animate-in fade-in slide-in-from-top-2 duration-300">
-             <label className="block text-xs font-medium text-gray-400 mb-1">System Instructions (Prompt Engineering)</label>
+             <label className="block text-xs font-medium text-gray-400 mb-1">Custom System Instruction / Context</label>
              <textarea 
                 value={systemInstruction}
                 onChange={(e) => setSystemInstruction(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none placeholder-gray-600"
-                placeholder="E.g., Act as a senior Python developer... OR Act as a travel agent..."
+                className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none"
+                placeholder="E.g., You are a senior software engineer helping me debug..."
              />
           </div>
         )}
@@ -226,14 +226,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
              {mode === AppMode.GENERAL ? (
                <>
                 <Brain className="w-16 h-16 mb-4 text-purple-500/50" />
-                <p className="text-lg font-medium">OmniMind AI</p>
-                <p className="text-sm mt-2">Upload files, images, code, or ask me anything.</p>
+                <p className="text-lg font-medium">How can I help you today?</p>
                </>
              ) : (
                 <>
                  <FileText className="w-16 h-16 mb-4 text-blue-500/50" />
-                 <p className="text-lg font-medium">Career Architect</p>
-                 <p className="text-sm mt-2 max-w-xs text-center">Upload your resume to get a job prospect analysis, vacancy links, and skill recommendations.</p>
+                 <p className="text-lg font-medium">Upload your resume to get started</p>
+                 <p className="text-sm mt-2 max-w-xs text-center">I can analyze job prospects, finding matching vacancies, and suggest skill improvements.</p>
                 </>
              )}
           </div>
@@ -355,7 +354,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={mode === AppMode.GENERAL ? "Message OmniChat..." : "Upload resume (PDF/Doc) or ask about jobs..."}
+              placeholder={mode === AppMode.GENERAL ? "Message OmniChat..." : "Upload resume or ask about jobs..."}
               className="flex-1 bg-transparent text-gray-100 placeholder-gray-500 p-2 focus:outline-none resize-none max-h-48 min-h-[44px] overflow-y-auto"
               rows={1}
               style={{ height: 'auto', minHeight: '44px' }}
@@ -379,7 +378,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ mode }) => {
             </button>
          </div>
          <p className="text-center text-[10px] text-gray-600 mt-2">
-           OmniMind AI can make mistakes. Please verify important information.
+           AI can make mistakes. Please double-check important information.
          </p>
       </div>
     </div>

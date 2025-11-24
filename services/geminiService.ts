@@ -1,8 +1,7 @@
 import { GoogleGenAI, type Part } from "@google/genai";
-import { Attachment, Message, ModelType } from "../types.ts";
+import { Attachment, Message, ModelType } from "../types";
 
 // Initialize the client
-// NOTE: process.env.API_KEY is shimmed in index.html for browser compatibility if not strictly replaced by build tools
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateChatResponse = async (
@@ -17,7 +16,7 @@ export const generateChatResponse = async (
     const parts: Part[] = [];
 
     // Add attachments
-    if (attachments && attachments.length > 0) {
+    if (attachments.length > 0) {
       for (const att of attachments) {
         parts.push({
           inlineData: {
@@ -29,17 +28,18 @@ export const generateChatResponse = async (
     }
 
     // Add text
+    // Ensure we don't send an empty text part if there are attachments, 
+    // unless the API requires text. Usually mixed content is fine.
+    // If there are no attachments, text is required.
     if (newMessage && newMessage.trim().length > 0) {
       parts.push({ text: newMessage });
-    }
-    
-    // CRITICAL FIX: Ensure parts is never empty. The API requires at least one part.
-    // If user sends only empty text or no attachments, send a placeholder to avoid error.
-    if (parts.length === 0) {
+    } else if (parts.length === 0) {
+      // Fallback: No attachments and no text? Should not happen due to UI checks.
+      // But if it does, send a space to avoid empty content error.
       parts.push({ text: " " });
     }
 
-    // Build chat history with strict validation
+    // Build chat history
     const chatHistory = history.map(msg => {
       const msgParts: Part[] = [];
       
@@ -49,12 +49,11 @@ export const generateChatResponse = async (
         });
       }
       
+      // Add text part if content exists
       if (msg.content && msg.content.trim().length > 0) {
         msgParts.push({ text: msg.content });
-      }
-
-      // Fallback for history items that might be effectively empty
-      if (msgParts.length === 0) {
+      } else if (msgParts.length === 0) {
+         // Fallback for history items that might be empty
          msgParts.push({ text: " " }); 
       }
 
@@ -65,20 +64,18 @@ export const generateChatResponse = async (
     });
 
     // Configure tools
-    const tools: any[] = [];
+    const tools = [];
     if (useSearch || model === ModelType.PRO) { 
        tools.push({ googleSearch: {} });
     }
 
-    const config: any = {};
-    
-    // Only add systemInstruction if it's a non-empty string
-    if (systemInstruction && systemInstruction.trim().length > 0) {
-      config.systemInstruction = systemInstruction;
-    }
+    const config: any = {
+      systemInstruction,
+      tools: tools.length > 0 ? tools : undefined,
+    };
 
-    if (tools.length > 0) {
-      config.tools = tools;
+    if (model === ModelType.PRO && (!config.tools || config.tools.length === 0)) {
+        config.tools = [{ googleSearch: {} }];
     }
 
     const chat = ai.chats.create({
@@ -87,8 +84,8 @@ export const generateChatResponse = async (
       history: chatHistory
     });
 
-    // Pass 'message' property with the parts array.
-    // We strictly use the { message: parts } format to support multi-modal inputs.
+    // Correct usage of sendMessage according to @google/genai SDK
+    // Pass 'message' property with the parts array
     const result = await chat.sendMessage({
       message: parts
     });
@@ -100,7 +97,7 @@ export const generateChatResponse = async (
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    return { text: `Error: ${error.message || "Something went wrong with the AI service. Please try again."}` };
+    return { text: `Error: ${error.message || "Something went wrong with the AI service."}` };
   }
 };
 
