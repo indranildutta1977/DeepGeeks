@@ -1,7 +1,8 @@
 import { GoogleGenAI, type Part } from "@google/genai";
-import { Attachment, Message, ModelType } from "../types";
+import { Attachment, Message, ModelType } from "../types.ts";
 
 // Initialize the client
+// NOTE: process.env.API_KEY is shimmed in index.html for browser compatibility if not strictly replaced by build tools
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateChatResponse = async (
@@ -33,6 +34,7 @@ export const generateChatResponse = async (
     }
     
     // CRITICAL FIX: Ensure parts is never empty. The API requires at least one part.
+    // If user sends only empty text or no attachments, send a placeholder to avoid error.
     if (parts.length === 0) {
       parts.push({ text: " " });
     }
